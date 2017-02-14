@@ -4,7 +4,7 @@ import CollectionForm from './CollectionForm';
 const CollectionFormHolder = (props) => {
     return (
         <div className="collection-form-holder">
-            <CollectionForm />
+            <CollectionForm formData={props.formData} handleCollectionFilterSubmit={props.handleCollectionFilterSubmit} />
         </div>
     );
 };

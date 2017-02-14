@@ -13,6 +13,7 @@ class DynamicCollection extends Component {
         this.state = {};
         this.fetchFormData = this.fetchFormData.bind(this);
         this.fetchCollectionData = this.fetchCollectionData.bind(this);
+        this.handleCollectionFilterSubmit = this.handleCollectionFilterSubmit.bind(this);
     }
 
     fetchFormData() {
@@ -29,7 +30,7 @@ class DynamicCollection extends Component {
             },
 
             error: (xhr, status, err) => {
-                console.error(this.props.url, status, err.toString());
+                console.error(this.props.formDataUrl, status, err.toString());
             }
         });
     }
@@ -42,13 +43,14 @@ class DynamicCollection extends Component {
             type: 'GET',
 
             success: data => {
+                console.log(data);
                 this.setState({
                     collectionData: data
                 });
             },
 
             error: (xhr, status, err) => {
-                console.error(this.props.url, status, err.toString());
+                console.error(this.props.dataUrl, status, err.toString());
             }
         });
     }
@@ -58,10 +60,15 @@ class DynamicCollection extends Component {
         this.fetchCollectionData();
     }
 
+    handleCollectionFilterSubmit() {
+        console.log('DynamicCollection.handleCollectionFilterSubmit');
+    }
+
     render() {
         return (
             <div className="collection">
-                <CollectionFormHolder formData={this.state.formData}/>
+                <CollectionFormHolder formData={this.state.formData}
+                                      handleCollectionFilterSubmit={this.handleCollectionFilterSubmit}/>
                 <CollectionHolder collectionData={this.state.collectionData}/>
             </div>
         );

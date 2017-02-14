@@ -7,6 +7,7 @@ use SilverStripe\Core\Extension;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\Map;
 use SilverStripe\ORM\PaginatedList;
 use SilverStripe\ORM\GroupedList;
 use SilverStripe\Forms\DropdownField;
@@ -14,6 +15,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\Form;
 use SilverStripe\View\Requirements;
+use SilverStripe\Dev\Debug;
 
 /**
  * Class CollectionExtension
@@ -133,8 +135,19 @@ class CollectionExtension extends Extension
      */
     public function CollectionFormJSON()
     {
-        $fields = $this->CollectionSearchForm()->Fields()->toNestedArray();
-        return Convert::array2json($fields);
+        $fields = $this->CollectionSearchForm()->Fields();
+        $fieldData = [];
+        foreach ($fields as $field) {
+            if ($field instanceof DropdownField) {
+                $fieldData['fields'] = [
+                    'type' => 'Dropdown',
+                    'source' => (is_array($field->getSource()) && !$field->getSource() instanceof Map)
+                        ? $field->getSource() : $field->getSource()->toArray(),
+                    'name' => $field->getName(),
+                ];
+            }
+        }
+        return Convert::array2json($fieldData);
     }
 
     /**
