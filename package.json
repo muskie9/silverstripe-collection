@@ -1,0 +1,56 @@
+{
+  "name": "dynamic-silverstripe-collection",
+  "version": "2.0.0",
+  "description": "A filterable collection of data",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "engines": {
+    "node": "^4.2.0"
+  },
+  "scripts": {
+    "build": "webpack -wd --optimize-minimize",
+    "build-plus": "webpack -wd --bail --optimize-minimize",
+    "lock": "npm-shrinkwrap --dev",
+    "lint": "eslint client/src && eslint admin/client/src && sass-lint -v"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dynamic/silverstripe-collection.git"
+  },
+  "keywords": [
+    "silverstripe",
+    "dynamic",
+    "collection"
+  ],
+  "author": "Dynamic",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/dynamic/dynamic-collection/issues"
+  },
+  "homepage": "https://github.com/dynamic/dynamic-collection#readme",
+  "dependencies": {
+    "babel-core": "^6.22.1",
+    "babel-loader": "^6.2.10",
+    "babel-preset-es2015": "^6.22.0",
+    "babel-preset-react": "^6.22.0",
+    "bootstrap": "^3.3.7",
+    "gulp-jshint": "*",
+    "gulp-livereload": "*",
+    "gulp-sass": "*",
+    "immutable": "^3.8.1",
+    "jquery": "^3.1.1",
+    "lodash": "^4.17.4",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-paginate": "^4.1.1",
+    "webpack": "^2.2.1"
+  },
+  "babel": {
+    "presets": [
+      "react",
+      "es2015"
+    ]
+  }
+}

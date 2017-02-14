@@ -1,11 +1,38 @@
 <?php
 
+namespace Dynamic\Collection\Extension;
+
+use SilverStripe\Core\Convert;
+use SilverStripe\Core\Extension;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\PaginatedList;
+use SilverStripe\ORM\GroupedList;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\Form;
+use SilverStripe\View\Requirements;
+
+/**
+ * Class CollectionExtension
+ * @package Dynamic\Collection\Extension
+ */
 class CollectionExtension extends Extension
 {
+
+    /**
+     * @var bool
+     */
+    private static $dynamic_form = false;
+
     /**
      * @var array
      */
     private static $allowed_actions = array(
+        'CollectionJSON' => '->canAccessJSON',
+        'CollectionFormJSON' => '->canAccessJSON',
         'CollectionSearchForm',
     );
 
@@ -13,6 +40,13 @@ class CollectionExtension extends Extension
      * @var DataList|ArrayList
      */
     private $collection;
+
+    public function onAfterInit()
+    {
+        if ($this->owner->config()->get('dynamic_form') && $this->canAccessJSON()) {
+            Requirements::javascript('collection/scripts/build/bundle.js');
+        }
+    }
 
     /**
      * @return ArrayList|DataList
@@ -26,10 +60,10 @@ class CollectionExtension extends Extension
     }
 
     /**
-     * @param SS_HTTPRequest|null $request
+     * @param HTTPRequest|null $request
      * @return $this
      */
-    public function setCollection(SS_HTTPRequest $request = null)
+    public function setCollection(HTTPRequest $request = null)
     {
         if ($request === null) {
             $request = $this->owner->request;
@@ -46,7 +80,7 @@ class CollectionExtension extends Extension
             : singleton($object)->getDefaultSearchContext();
 
         $sort = ($request->getVar('Sort'))
-            ? (string) $request->getVar('Sort')
+            ? (string)$request->getVar('Sort')
             : singleton($object)->stat('default_sort');
 
         $collection = $context->getResults($searchCriteria)->sort($sort);
@@ -61,10 +95,10 @@ class CollectionExtension extends Extension
     /**
      * @return string
      */
-    public function getCollectionObject()
+    protected function getCollectionObject()
     {
         if ($object = $this->owner->config()->managed_object) {
-            $object = (string) $object;
+            $object = (string)$object;
         } else {
             $object = 'Page';
         }
@@ -77,25 +111,42 @@ class CollectionExtension extends Extension
     /**
      * @return int
      */
-    public function getCollectionSize()
+    protected function getCollectionSize()
     {
         if ($object = $this->owner->config()->page_size) {
-            return (int) $object;
+            return (int)$object;
         }
 
         return 10;
     }
 
     /**
-     * @param SS_HTTPRequest|null $request
+     * @return string
+     */
+    public function CollectionJSON()
+    {
+        return Convert::array2json($this->getCollection()->toNestedArray());
+    }
+
+    /**
+     * @return string
+     */
+    public function CollectionFormJSON()
+    {
+        $fields = $this->CollectionSearchForm()->Fields()->toNestedArray();
+        return Convert::array2json($fields);
+    }
+
+    /**
+     * @param HTTPRequest|null $request
      * @return PaginatedList
      */
-    public function PaginatedList(SS_HTTPRequest $request = null)
+    public function PaginatedList(HTTPRequest $request = null)
     {
         if ($request === null) {
             $request = $this->owner->request;
         }
-        $start = ($request->getVar('start')) ? (int) $request->getVar('start') : 0;
+        $start = ($request->getVar('start')) ? (int)$request->getVar('start') : 0;
 
         $records = PaginatedList::create($this->getCollection(), $this->owner->request);
         $records->setPageStart($start);
@@ -127,7 +178,7 @@ class CollectionExtension extends Extension
     {
         $object = $this->getCollectionObject();
         $request = ($this->owner->request) ? $this->owner->request : $this->owner->parentController->getRequest();
-        $sort = ($request->getVar('Sort')) ? (string) $request->getVar('Sort') : singleton($object)->stat('default_sort');
+        $sort = ($request->getVar('Sort')) ? (string)$request->getVar('Sort') : singleton($object)->stat('default_sort');
 
         $context = (method_exists($object, 'getCustomSearchContext')) ? singleton($object)->getCustomSearchContext() : singleton($object)->getDefaultSearchContext();
         $fields = $context->getSearchFields();
@@ -170,12 +221,20 @@ class CollectionExtension extends Extension
             ->setFormMethod('get')
             ->disableSecurityToken()
             ->loadDataFrom($request->getVars())
-            ->setFormAction($this->owner->Link())
-        ;
+            ->setFormAction($this->owner->Link());
 
         // allow $form to be extended via extension
         $this->owner->extend('updateCollectionForm', $form);
 
         return $form;
     }
+
+    /**
+     * @return mixed
+     */
+    public function canAccessJSON()
+    {
+        return ($this->owner->config()->get('dynamic_form'));
+    }
+
 }

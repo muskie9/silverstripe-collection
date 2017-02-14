@@ -1,0 +1,9 @@
+# Ignore dist files
+
+# Ignore legacy files
+
+# Ignore vendor
+node_modules/
+thirdparty/
+
+# Ignore language files (auto-generated)
