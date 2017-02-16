@@ -33,8 +33,9 @@ class CollectionExtension extends Extension
      * @var array
      */
     private static $allowed_actions = array(
-        'CollectionJSON' => '->canAccessJSON',
-        'CollectionFormJSON' => '->canAccessJSON',
+        'collectionjson' => '->canAccessJSON',
+        'collectionformjson' => '->canAccessJSON',
+        'collectiontotaljson' => '->canAccessJSON',
         'CollectionSearchForm',
     );
 
@@ -123,17 +124,41 @@ class CollectionExtension extends Extension
     }
 
     /**
+     * @param HTTPRequest $request
      * @return string
      */
-    public function CollectionJSON()
+    public function collectionjson(HTTPRequest $request)
     {
-        return Convert::array2json($this->getCollection()->toNestedArray());
+        $collection = $this->getCollection();
+        if ($request->getVar('filter')) {
+            $collection = $collection->filter($request->getVar('filter'));
+        }
+        if ($request->getVar('sort')) {
+            $collection = $collection->sort($collection->sort($request->getVar('sort')));
+        }
+        if ($request->getVar('limit')) {
+            if ($request->getVar('offset')) {
+                $collection = $collection->limit($request->getVar('limit'), $request->getVar('offset'));
+            } else {
+                $collection = $collection->limit($request->getVar('limit'));
+            }
+
+        }
+        return Convert::array2json($collection->toNestedArray());
     }
 
     /**
      * @return string
      */
-    public function CollectionFormJSON()
+    public function collectiontotaljson()
+    {
+        return Convert::array2json(['total_count' => $this->getCollection()->count()]);
+    }
+
+    /**
+     * @return string
+     */
+    public function collectionformjson()
     {
         $fields = $this->CollectionSearchForm()->Fields();
         $fieldData = [];

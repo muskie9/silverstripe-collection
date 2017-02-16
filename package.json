@@ -40,9 +40,12 @@
     "gulp-livereload": "*",
     "gulp-sass": "*",
     "immutable": "^3.8.1",
+    "install": "^0.8.7",
     "jquery": "^3.1.1",
     "lodash": "^4.17.4",
+    "npm": "^4.2.0",
     "react": "^15.4.2",
+    "react-addons-create-fragment": "^15.4.2",
     "react-dom": "^15.4.2",
     "react-paginate": "^4.1.1",
     "webpack": "^2.2.1"

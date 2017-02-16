@@ -4,9 +4,9 @@ class CollectionForm extends Component {
     constructor(props) {
         super(props);
 
-        console.log(props);
+        const fields = (props.formData === undefined) ? [{}] : props.formData.fields;
         this.state = {
-            fields: props.formData.fields,
+            fields: fields,
             handleSubmit: props.handleCollectionFilterSubmit,
         };
         this.handleSubmit = this.handleSubmit.bind(this);
